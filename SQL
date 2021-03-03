@@ -1,0 +1,16 @@
+id	int	11	0	True
+name	varchar	255	0	True
+password	varchar	255	0	False
+title	varchar	255	0	False
+namesurname	varchar	255	0	False
+tcvergino	varchar	255	0	False
+birthday	date	0	0	False
+telefon	varchar	255	0	False
+adres	text	0	0	False
+userimage	varchar	255	0	False
+mail	varchar	255	0	False
+agent	varchar	255	0	False
+status	int	1	0	True
+allowip	varchar	255	0	False
+
+table SQL
