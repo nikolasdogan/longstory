@@ -1,0 +1,105 @@
+<?php
+session_start();
+error_reporting(0);
+include("db.php");
+$cookie_name = "session_log";
+if(!isset($_COOKIE[$cookie_name] )) {
+	if(isset($_POST['login']))
+	{
+
+		$ret=mysqli_query($con,"SELECT * FROM admin WHERE mail='".$_POST['email_2']."' and password='".$_POST['password_2']."'");
+		$num=mysqli_fetch_array($ret);
+		if($num>0)
+		{
+			$_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
+			$sessionrememberme  = $_POST['remember'];
+			$sessionpass        = $_POST['password_2'];
+			$sessionlogin       = $_SESSION['login']        = $_POST['email_2'];
+			$sessionid          = $_SESSION['id']           = $num['id'];
+			$sessionname        = $_SESSION['name']         = $num['name'];
+			$val3 =date("Y/m/d");
+			date_default_timezone_set("Europe/Istanbul");
+			$time=date("h:i:sa");
+			$tim = $time;
+			$ip_address=$_SERVER['REMOTE_ADDR'];
+			$web_link = "http://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+			$geopluginURL='http://www.geoplugin.net/php.gp?ip='.$ip_address;
+			$addrDetailsArr = unserialize(file_get_contents($geopluginURL));
+			$city = $addrDetailsArr['geoplugin_city'];
+			$country = $addrDetailsArr['geoplugin_countryName'];
+			$ret=mysqli_query($con,"insert into usercheck(logindate,logintime,user_id,username,email,ip,mac,city,country,index)values('".$val3."','".$tim."','".$_SESSION['id']."','".$_SESSION['name']."','".$_SESSION['login']."','$ip_address','$mac','$city','$country','$web_link')");
+			ob_start();
+			if(isset($_POST['remember'])){
+				setcookie ("session_log",$sessionlogin,time() + (28800), '/bos'); //kullanıcı adı cookie 8
+			}else {
+				setcookie ("session_log",$sessionlogin,time() + (2592000), $web_link); //kullanıcı adı cookie 30 gün
+			}
+			
+			system('ipconfig /all');
+			$mycom = ob_get_contents();
+			ob_clean();
+			$findme = "Physical";
+			$pmac = strpos($mycom, $findme);
+			$mac = substr($mycom,($pmac+36),17);
+
+			$extra="dashboard.php";
+			echo "<script>window.location.href='".$extra."'</script>";
+			exit();
+		}
+		else
+		{
+			$_SESSION['action1']='<p class="mb-0" style="text-color: red;"><div class="alert alert-danger" role="alert"><strong>HATA - Mail veya Şifre Hatalı!...</strong></div></p>';
+			$extra="index.php";
+			echo "<script>window.location.href='".$extra."'</script>";
+			exit();
+		}
+	}} else {
+$extra = "lock-screen.php";
+echo "<script>window.location.href='".$extra."'</script>";
+}
+?>
+<?php echo $_SESSION['action1']; ?>
+	
+        <form id="form" action="" method="post">
+            <div class="form-group">
+                <label class="text-label" for="email_2">E-Posta adresi:</label>
+                <div class="input-group input-group-merge">
+                    <input id="email_2" name="email_2" type="email" required="" value="<?php if(isset($_COOKIE["session_log"])) { echo $_COOKIE["session_log"]; } ?>" class="form-control form-control-prepended" placeholder="bilgi@alacaktakipsistemi.com">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">
+                            <span class="far fa-envelope"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="text-label" for="password_2">Şifre:</label>
+                <div class="input-group input-group-merge">
+                    <input id="password_2" name="password_2" type="password" value="<?php if(isset($_COOKIE["session_pas"])) { echo $_COOKIE["session_pas"]; } ?>" required class="form-control form-control-prepended" placeholder="">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">
+                            <span class="fa fa-key"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group mb-2">
+                <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="remember" <?php if(isset($_COOKIE["session_log"])) { ?> checked="" <?php } ?> />
+                    <label class="custom-control-label"  for="remember">Beni Hatırla</label>
+                </div>
+            </div>
+            <div class="form-group text-center">
+                <button class="btn btn-primary mb-1" name="login" type="submit">Giriş</button><br>
+                <a href="forgot-password.php">Şifremi Unuttum?</a> <br>
+                Üyeliğiniz yok mu? <a class="text-body text-underline" href="signup.php">Kayıt Ol!</a>
+            </div>
+        </form>
+    </div>
+
+<?php include "js.php";?>
+<?php include "js-kod.php";?>
+
+
+</body>
+</html>
