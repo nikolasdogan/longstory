@@ -34,4 +34,21 @@ if($_COOKIE['session_log'] == $adminmail){
 												echo '<script type="text/javascript">window.location = "logout.php"</script>';}}
 
 
+?><?php 
+
+    function TelegramBildirim($body){
+        $token = '0000000000:00000000000000000000000000'; // telegram bot ununun sizin için oluşturduğu token ını bu kısma yazıyoruz 
+        $user_id = -0000000000; // telegram da grup için yetkili olan kişinin belirlenmiş ad sini ekliyoruz
+       //ATS-CRM Telegram Grup a basar $user_id = '-430223101' 
+        $msg = $body.'@NikolasDogan';
+        $request_params = [
+          'chat_id' => $user_id,
+          'text' => $msg
+        ];
+        //////////////////////////////////
+          $request_url = 'https://api.telegram.org/bot'.$token.'/sendMessage?'.http_build_query($request_params);
+        
+          file_get_contents($request_url);
+    
+    }
 ?>
